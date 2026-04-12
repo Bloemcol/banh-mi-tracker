@@ -36,5 +36,121 @@
                     <i data-lucide="star" onclick="setRating(2)" class="star-inactive cursor-pointer w-8 h-8"></i>
                     <i data-lucide="star" onclick="setRating(3)" class="star-inactive cursor-pointer w-8 h-8"></i>
                     <i data-lucide="star" onclick="setRating(4)" class="star-inactive cursor-pointer w-8 h-8"></i>
-                    <i data-lucide="star" onclick
+                    <i data-lucide="star" onclick="setRating(5)" class="star-inactive cursor-pointer w-8 h-8"></i>
+                </div>
+            </div>
 
+            <input type="text" id="noteInput" placeholder="Where from? Best part?" 
+                class="w-full p-4 rounded-xl border-2 border-stone-100 focus:border-orange-500 outline-none transition-all bg-stone-50">
+            
+            <button onclick="addBanhMi()" class="w-full banh-mi-gradient active:scale-95 transition-all text-white rounded-2xl py-4 shadow-xl flex items-center justify-center gap-3 text-lg font-bold">
+                <i data-lucide="plus-circle"></i> LOG SANDWICH
+            </button>
+        </div>
+
+        <div class="space-y-4">
+            <div class="flex justify-between items-end px-2">
+                <h2 class="text-lg font-bold flex items-center gap-2 text-stone-600">
+                    <i data-lucide="history"></i> History
+                </h2>
+                <button onclick="clearAll()" class="text-xs text-stone-300 font-bold tracking-tighter">RESET ALL</button>
+            </div>
+            <div id="historyList" class="space-y-3"></div>
+        </div>
+    </main>
+
+    <script>
+        // Load and Migrate Data
+        let history = JSON.parse(localStorage.getItem('banhMiHistory')) || [];
+        let needsMigration = false;
+        
+        history = history.map(item => {
+            if (item.rating === undefined) {
+                needsMigration = true;
+                return { ...item, rating: 5 }; // Default legacy entries to 5 stars
+            }
+            return item;
+        });
+
+        if (needsMigration) {
+            localStorage.setItem('banhMiHistory', JSON.stringify(history));
+        }
+
+        let currentRating = 0;
+
+        function setRating(n) {
+            currentRating = n;
+            const stars = document.querySelectorAll('#starPicker i');
+            stars.forEach((star, i) => {
+                if (i < n) {
+                    star.classList.add('star-active');
+                    star.classList.remove('star-inactive');
+                } else {
+                    star.classList.remove('star-active');
+                    star.classList.add('star-inactive');
+                }
+            });
+        }
+
+        function updateUI() {
+            const countEl = document.getElementById('count');
+            const listEl = document.getElementById('historyList');
+            countEl.innerText = history.length;
+            
+            listEl.innerHTML = history.length === 0 
+                ? '<div class="text-center py-10 text-stone-400 italic">No banh mis yet.</div>'
+                : [...history].reverse().map((item, index) => `
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-stone-100 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="font-black text-stone-300 text-sm">#${history.length - index}</span>
+                            <div class="flex text-orange-500">
+                                ${Array(5).fill(0).map((_, i) => `
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="${i < item.rating ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                `).join('')}
+                            </div>
+                        </div>
+                        ${item.note ? `<p class="text-stone-700 font-medium italic">"${item.note}"</p>` : ''}
+                        <div class="text-[10px] text-stone-400 font-bold uppercase tracking-widest">${item.date} @ ${item.time}</div>
+                    </div>
+                `).join('');
+            
+            lucide.createIcons();
+        }
+
+        function addBanhMi() {
+            const noteInput = document.getElementById('noteInput');
+            if (currentRating === 0) {
+                alert("Give it a rating first!");
+                return;
+            }
+
+            const now = new Date();
+            const newItem = {
+                rating: currentRating,
+                note: noteInput.value.trim(),
+                date: now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+            };
+            
+            history.push(newItem);
+            localStorage.setItem('banhMiHistory', JSON.stringify(history));
+            
+            noteInput.value = '';
+            setRating(0);
+            updateUI();
+            
+            if (window.navigator.vibrate) window.navigator.vibrate(50);
+        }
+
+        function clearAll() {
+            if (confirm("Delete your history?")) {
+                history = [];
+                localStorage.removeItem('banhMiHistory');
+                updateUI();
+            }
+        }
+
+        updateUI();
+    </script>
+</body>
+</html>
