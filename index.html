@@ -15,6 +15,8 @@
         .mode-dark { background-color: #0c0a09; color: #f5f5f4; }
         .mode-dark .card { background-color: #1c1917; border-color: #292524; }
         .mode-dark .input-field { background-color: #0c0a09; border-color: #292524; color: #f5f5f4; }
+        .star-filled { fill: #f59e0b; color: #f59e0b; }
+        .star-empty { color: #44403c; opacity: 0.5; }
     </style>
 </head>
 <body class="mode-dark min-h-screen pb-10">
@@ -36,13 +38,13 @@
         <div class="card p-5 rounded-3xl shadow-lg border space-y-4">
             <div class="grid grid-cols-4 gap-3">
                 <div class="col-span-1">
-                    <label class="text-[10px] font-bold text-stone-500 uppercase block mb-1">Rating</label>
+                    <label class="text-[10px] font-bold text-stone-500 uppercase block mb-1">Stars</label>
                     <input type="number" id="ratingInput" min="1" max="5" inputmode="numeric" placeholder="1-5" 
                         class="input-field w-full p-4 rounded-xl border-2 outline-none text-center font-bold text-lg">
                 </div>
                 <div class="col-span-3">
                     <label class="text-[10px] font-bold text-stone-500 uppercase block mb-1">Details</label>
-                    <input type="text" id="noteInput" placeholder="Location..." 
+                    <input type="text" id="noteInput" placeholder="Location or thoughts..." 
                         class="input-field w-full p-4 rounded-xl border-2 outline-none">
                 </div>
             </div>
@@ -62,7 +64,6 @@
     </main>
 
     <script>
-        // Restored your full original Sapa comment
         const initialData = [
             { note: "Tiệm nhà Tấm Cám Bánh Mì Tiệm Nhà Tấm Cám", rating: 3, date: "Apr 11", time: "16:00" },
             { note: "Bánh Mì ơi - Hà Nội (the best! Vegan and super crunchy and tasty)", rating: 5, date: "Apr 12", time: "11:00" },
@@ -73,7 +74,6 @@
 
         let history = JSON.parse(localStorage.getItem('banhMiHistory')) || [];
 
-        // Force reset to this list if the Sapa entry isn't right yet
         if (history.length < 5 || (history[4] && history[4].time === "18:10")) {
             history = initialData;
             localStorage.setItem('banhMiHistory', JSON.stringify(history));
@@ -97,15 +97,25 @@
         function updateUI() {
             document.getElementById('count').innerText = history.length;
             const listEl = document.getElementById('historyList');
-            listEl.innerHTML = history.length === 0 ? '' : [...history].reverse().map((item, index) => `
-                <div class="card p-4 rounded-2xl border shadow-sm flex justify-between items-center transition-colors">
-                    <div class="pr-4">
-                        <p class="font-bold text-sm leading-tight">${item.note || 'Banh Mi'}</p>
-                        <p class="text-[10px] text-stone-500 uppercase font-bold mt-1">${item.date} @ ${item.time}</p>
+            
+            listEl.innerHTML = history.length === 0 ? '' : [...history].reverse().map((item, index) => {
+                // Generate the 5-star row visually
+                const starRow = Array.from({length: 5}, (_, i) => {
+                    const isFilled = i < item.rating;
+                    return `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="${isFilled ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" class="${isFilled ? 'star-filled' : 'star-empty'}"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+                }).join('');
+
+                return `
+                    <div class="card p-4 rounded-2xl border shadow-sm space-y-2 transition-colors">
+                        <div class="flex justify-between items-center">
+                            <span class="font-black text-stone-500 text-[10px] italic">#${history.length - index}</span>
+                            <div class="flex gap-0.5">${starRow}</div>
+                        </div>
+                        <p class="font-bold text-sm leading-snug">${item.note || 'Banh Mi'}</p>
+                        <p class="text-[10px] text-stone-500 uppercase font-bold tracking-tighter">${item.date} @ ${item.time}</p>
                     </div>
-                    <div class="text-orange-500 font-black text-2xl flex-shrink-0">${item.rating}<span class="text-xs">★</span></div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
             lucide.createIcons();
         }
 
@@ -131,7 +141,7 @@
         }
 
         function clearAll() {
-            if (confirm("Reset everything?")) {
+            if (confirm("Reset?")) {
                 history = [];
                 localStorage.removeItem('banhMiHistory');
                 updateUI();
