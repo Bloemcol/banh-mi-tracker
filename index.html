@@ -9,9 +9,8 @@
     <style>
         body { -webkit-tap-highlight-color: transparent; transition: background-color 0.3s ease, color 0.3s ease; }
         .banh-mi-gradient { background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%); }
-        .star-active { fill: #f59e0b; color: #f59e0b; }
+        .star-active { fill: #f59e0b !important; color: #f59e0b !important; }
         
-        /* Light/Dark dynamic variables */
         .mode-light { background-color: #fafaf9; color: #1c1917; }
         .mode-light .card { background-color: #ffffff; border-color: #e7e5e4; color: #44403c; }
         .mode-light .star-inactive { fill: transparent; color: #d6d3d1; }
@@ -21,6 +20,9 @@
         .mode-dark .card { background-color: #1c1917; border-color: #292524; color: #a8a29e; }
         .mode-dark .star-inactive { fill: transparent; color: #44403c; }
         .mode-dark .input-box { background-color: #0c0a09; border-color: #292524; color: #f5f5f4; }
+        
+        /* Ensure stars are clickable even after Lucide replaces them */
+        .star-btn { cursor: pointer; -webkit-appearance: none; background: none; border: none; padding: 4px; }
     </style>
 </head>
 <body class="mode-dark min-h-screen pb-10">
@@ -44,19 +46,19 @@
         <div class="card p-5 rounded-3xl shadow-xl border space-y-5 transition-all">
             <div class="flex flex-col items-center gap-2">
                 <span class="text-[10px] font-bold text-stone-500 uppercase tracking-widest">Rate this roll</span>
-                <div class="flex justify-center gap-2" id="starPicker">
-                    <i data-lucide="star" onclick="setRating(1)" class="star-inactive cursor-pointer w-8 h-8 transition-colors"></i>
-                    <i data-lucide="star" onclick="setRating(2)" class="star-inactive cursor-pointer w-8 h-8 transition-colors"></i>
-                    <i data-lucide="star" onclick="setRating(3)" class="star-inactive cursor-pointer w-8 h-8 transition-colors"></i>
-                    <i data-lucide="star" onclick="setRating(4)" class="star-inactive cursor-pointer w-8 h-8 transition-colors"></i>
-                    <i data-lucide="star" onclick="setRating(5)" class="star-inactive cursor-pointer w-8 h-8 transition-colors"></i>
+                <div class="flex justify-center gap-1" id="starPicker">
+                    <button type="button" onclick="setRating(1)" class="star-btn"><i data-lucide="star" class="star-inactive w-8 h-8 pointer-events-none"></i></button>
+                    <button type="button" onclick="setRating(2)" class="star-btn"><i data-lucide="star" class="star-inactive w-8 h-8 pointer-events-none"></i></button>
+                    <button type="button" onclick="setRating(3)" class="star-btn"><i data-lucide="star" class="star-inactive w-8 h-8 pointer-events-none"></i></button>
+                    <button type="button" onclick="setRating(4)" class="star-btn"><i data-lucide="star" class="star-inactive w-8 h-8 pointer-events-none"></i></button>
+                    <button type="button" onclick="setRating(5)" class="star-btn"><i data-lucide="star" class="star-inactive w-8 h-8 pointer-events-none"></i></button>
                 </div>
             </div>
 
             <input type="text" id="noteInput" placeholder="Location or thoughts..." 
                 class="input-box w-full p-4 rounded-xl border-2 outline-none transition-all placeholder-stone-500 shadow-inner">
             
-            <button onclick="addBanhMi()" class="w-full banh-mi-gradient active:scale-95 transition-all text-white rounded-2xl py-4 shadow-lg flex items-center justify-center gap-3 text-lg font-bold">
+            <button onclick="addBanhMi()" class="w-full banh-mi-gradient active:scale-[0.97] transition-all text-white rounded-2xl py-4 shadow-lg flex items-center justify-center gap-3 text-lg font-bold">
                 <i data-lucide="plus-circle"></i> LOG SANDWICH
             </button>
         </div>
@@ -73,6 +75,7 @@
     </main>
 
     <script>
+        // Migration Data
         const initialData = [
             { note: "Tiệm nhà Tấm Cám Bánh Mì", rating: 3, date: "Apr 11", time: "16:00" },
             { note: "Bánh Mì ơi - Hà Nội (Vegan, crunchy, tasty!)", rating: 5, date: "Apr 12", time: "11:00" },
@@ -82,13 +85,12 @@
 
         let history = JSON.parse(localStorage.getItem('banhMiHistory')) || [];
         let isDarkMode = localStorage.getItem('theme') !== 'light';
+        let currentRating = 0;
 
         if (history.length === 0) {
             history = initialData;
             localStorage.setItem('banhMiHistory', JSON.stringify(history));
         }
-
-        let currentRating = 0;
 
         function toggleTheme() {
             isDarkMode = !isDarkMode;
@@ -105,10 +107,17 @@
 
         function setRating(n) {
             currentRating = n;
-            document.querySelectorAll('#starPicker i').forEach((star, i) => {
-                star.classList.toggle('star-active', i < n);
-                star.classList.toggle('star-inactive', i >= n);
+            const starButtons = document.querySelectorAll('#starPicker .star-btn i');
+            starButtons.forEach((star, i) => {
+                if (i < n) {
+                    star.classList.add('star-active');
+                    star.classList.remove('star-inactive');
+                } else {
+                    star.classList.remove('star-active');
+                    star.classList.add('star-inactive');
+                }
             });
+            if (window.navigator.vibrate) window.navigator.vibrate(20);
         }
 
         function updateUI() {
@@ -146,9 +155,9 @@
             });
             localStorage.setItem('banhMiHistory', JSON.stringify(history));
             noteInput.value = '';
-            setRating(0);
+            setRating(0); // This resets stars visually
             updateUI();
-            if (window.navigator.vibrate) window.navigator.vibrate(50);
+            if (window.navigator.vibrate) window.navigator.vibrate(60);
         }
 
         function clearAll() {
