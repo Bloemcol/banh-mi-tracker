@@ -7,89 +7,79 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        body { -webkit-tap-highlight-color: transparent; transition: background-color 0.3s ease; touch-action: manipulation; }
+        body { -webkit-tap-highlight-color: transparent; transition: background-color 0.3s ease; }
         .banh-mi-gradient { background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%); }
-        .star-active { fill: #f59e0b !important; color: #f59e0b !important; }
-        
         .mode-light { background-color: #fafaf9; color: #1c1917; }
-        .mode-light .card { background-color: #ffffff; border-color: #e7e5e4; color: #44403c; }
-        .mode-light .star-inactive { fill: transparent; color: #d6d3d1; }
-        .mode-light .input-box { background-color: #f5f5f4; border-color: #e7e5e4; color: #1c1917; }
-
+        .mode-light .card { background-color: #ffffff; border-color: #e7e5e4; }
+        .mode-light .input-field { background-color: #f5f5f4; border-color: #e7e5e4; color: #1c1917; }
         .mode-dark { background-color: #0c0a09; color: #f5f5f4; }
-        .mode-dark .card { background-color: #1c1917; border-color: #292524; color: #a8a29e; }
-        .mode-dark .star-inactive { fill: transparent; color: #44403c; }
-        .mode-dark .input-box { background-color: #0c0a09; border-color: #292524; color: #f5f5f4; }
-        
-        /* High-response touch targets */
-        .touch-target { cursor: pointer; border: none; background: none; padding: 12px; margin: -8px; display: inline-flex; align-items: center; justify-content: center; z-index: 50; position: relative; }
+        .mode-dark .card { background-color: #1c1917; border-color: #292524; }
+        .mode-dark .input-field { background-color: #0c0a09; border-color: #292524; color: #f5f5f4; }
     </style>
 </head>
 <body class="mode-dark min-h-screen pb-10">
 
-    <header class="banh-mi-gradient p-6 text-white text-center shadow-2xl relative">
-        <h1 class="text-3xl font-black tracking-tighter flex justify-center items-center gap-2">
-            <i data-lucide="utensils"></i> BÀNH MÌ LOG
-        </h1>
-        <button onpointerdown="toggleTheme()" class="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-white/20 rounded-full active:scale-90 transition-transform z-50">
+    <header class="banh-mi-gradient p-6 text-white text-center shadow-xl relative">
+        <h1 class="text-3xl font-black tracking-tighter">BÀNH MÌ LOG</h1>
+        <button onclick="toggleTheme()" class="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-white/20 rounded-full">
             <i id="themeIcon" data-lucide="sun" class="w-6 h-6"></i>
         </button>
     </header>
 
     <main class="max-w-md mx-auto p-6 space-y-6">
         
-        <div class="card rounded-3xl p-6 shadow-xl border text-center transition-all">
+        <div class="card rounded-3xl p-6 shadow-lg border text-center">
             <span class="text-stone-500 uppercase tracking-widest text-[10px] font-bold">Total Devoured</span>
             <div id="count" class="text-6xl font-black text-orange-500 my-1">0</div>
         </div>
 
-        <div class="card p-5 rounded-3xl shadow-xl border space-y-5 transition-all">
-            <div class="flex flex-col items-center gap-2">
-                <span class="text-[10px] font-bold text-stone-500 uppercase tracking-widest">Rate this roll</span>
-                <div class="flex justify-center" id="starPicker">
-                    <button type="button" onpointerdown="setRating(1)" class="touch-target"><i data-lucide="star" class="star-inactive w-8 h-8 pointer-events-none"></i></button>
-                    <button type="button" onpointerdown="setRating(2)" class="touch-target"><i data-lucide="star" class="star-inactive w-8 h-8 pointer-events-none"></i></button>
-                    <button type="button" onpointerdown="setRating(3)" class="touch-target"><i data-lucide="star" class="star-inactive w-8 h-8 pointer-events-none"></i></button>
-                    <button type="button" onpointerdown="setRating(4)" class="touch-target"><i data-lucide="star" class="star-inactive w-8 h-8 pointer-events-none"></i></button>
-                    <button type="button" onpointerdown="setRating(5)" class="touch-target"><i data-lucide="star" class="star-inactive w-8 h-8 pointer-events-none"></i></button>
+        <div class="card p-5 rounded-3xl shadow-lg border space-y-4">
+            <div class="grid grid-cols-4 gap-3">
+                <div class="col-span-1">
+                    <label class="text-[10px] font-bold text-stone-500 uppercase block mb-1">Rating</label>
+                    <input type="number" id="ratingInput" min="1" max="5" inputmode="numeric" placeholder="1-5" 
+                        class="input-field w-full p-4 rounded-xl border-2 outline-none text-center font-bold text-lg">
+                </div>
+                <div class="col-span-3">
+                    <label class="text-[10px] font-bold text-stone-500 uppercase block mb-1">Details</label>
+                    <input type="text" id="noteInput" placeholder="Location..." 
+                        class="input-field w-full p-4 rounded-xl border-2 outline-none">
                 </div>
             </div>
-
-            <input type="text" id="noteInput" placeholder="Location or thoughts..." 
-                class="input-box w-full p-4 rounded-xl border-2 outline-none transition-all placeholder-stone-500 shadow-inner z-10">
             
-            <button onpointerdown="addBanhMi()" class="w-full banh-mi-gradient active:scale-[0.97] transition-all text-white rounded-2xl py-4 shadow-lg flex items-center justify-center gap-3 text-lg font-bold z-20">
-                <i data-lucide="plus-circle"></i> LOG SANDWICH
+            <button onclick="addBanhMi()" class="w-full banh-mi-gradient text-white rounded-2xl py-4 shadow-lg text-lg font-bold active:scale-[0.98] transition-transform">
+                LOG SANDWICH
             </button>
         </div>
 
         <div class="space-y-4">
             <div class="flex justify-between items-end px-2">
-                <h2 class="text-lg font-bold flex items-center gap-2 text-stone-500">
-                    <i data-lucide="history"></i> History
-                </h2>
-                <button onpointerdown="clearAll()" class="text-[10px] text-stone-400 font-bold tracking-tighter uppercase p-2">Reset All</button>
+                <h2 class="text-lg font-bold text-stone-500 italic">History</h2>
+                <button onclick="clearAll()" class="text-[10px] text-stone-400 font-bold uppercase">Reset</button>
             </div>
             <div id="historyList" class="space-y-3"></div>
         </div>
     </main>
 
     <script>
+        // Restored your full original Sapa comment
         const initialData = [
-            { note: "Tiệm nhà Tấm Cám Bánh Mì", rating: 3, date: "Apr 11", time: "16:00" },
-            { note: "Bánh Mì ơi - Hà Nội (Vegan, crunchy, tasty!)", rating: 5, date: "Apr 12", time: "11:00" },
-            { note: "Tự Châu Veggie - Vegan Mixed Pho & Banhmi", rating: 3, date: "Apr 12", time: "16:00" },
-            { note: "Hàng Bánh Mì (No crunch)", rating: 1, date: "Apr 12", time: "21:45" }
+            { note: "Tiệm nhà Tấm Cám Bánh Mì Tiệm Nhà Tấm Cám", rating: 3, date: "Apr 11", time: "16:00" },
+            { note: "Bánh Mì ơi - Hà Nội (the best! Vegan and super crunchy and tasty)", rating: 5, date: "Apr 12", time: "11:00" },
+            { note: "Tự Châu Veggie - Vegan Mixed Pho, Banhmi & Kombucha", rating: 3, date: "Apr 12", time: "16:00" },
+            { note: "Hàng Bánh Mì (Hang Banh Mi) (no crunch)", rating: 1, date: "Apr 12", time: "21:45" },
+            { note: "Egg mayo was okay! The other stuff was way better (coconut coffee and the smashed croissants as waffles) @ THE MIST SAPA", rating: 3, date: "Apr 15", time: "11:00" }
         ];
 
         let history = JSON.parse(localStorage.getItem('banhMiHistory')) || [];
-        let isDarkMode = localStorage.getItem('theme') !== 'light';
-        let currentRating = 0;
 
-        if (history.length === 0) {
+        // Force reset to this list if the Sapa entry isn't right yet
+        if (history.length < 5 || (history[4] && history[4].time === "18:10")) {
             history = initialData;
             localStorage.setItem('banhMiHistory', JSON.stringify(history));
         }
+
+        let isDarkMode = localStorage.getItem('theme') !== 'light';
 
         function toggleTheme() {
             isDarkMode = !isDarkMode;
@@ -100,63 +90,44 @@
         function applyTheme() {
             document.body.className = isDarkMode ? 'mode-dark min-h-screen pb-10' : 'mode-light min-h-screen pb-10';
             const icon = document.getElementById('themeIcon');
-            if(icon) icon.setAttribute('data-lucide', isDarkMode ? 'sun' : 'moon');
+            icon.setAttribute('data-lucide', isDarkMode ? 'sun' : 'moon');
             lucide.createIcons();
-        }
-
-        function setRating(n) {
-            currentRating = n;
-            const starIcons = document.querySelectorAll('#starPicker i');
-            starIcons.forEach((star, i) => {
-                if (i < n) {
-                    star.classList.add('star-active');
-                    star.classList.remove('star-inactive');
-                } else {
-                    star.classList.remove('star-active');
-                    star.classList.add('star-inactive');
-                }
-            });
-            if (window.navigator.vibrate) window.navigator.vibrate(20);
         }
 
         function updateUI() {
             document.getElementById('count').innerText = history.length;
             const listEl = document.getElementById('historyList');
-            
-            listEl.innerHTML = history.length === 0 
-                ? '<div class="text-center py-10 text-stone-500 italic">No banh mis yet.</div>'
-                : [...history].reverse().map((item, index) => `
-                    <div class="card p-4 rounded-2xl shadow-md border space-y-2 transition-all">
-                        <div class="flex justify-between items-center">
-                            <span class="font-black text-stone-400 text-[10px] italic">#${history.length - index}</span>
-                            <div class="flex text-orange-500">
-                                ${Array(5).fill(0).map((_, i) => `
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="${i < item.rating ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                                `).join('')}
-                            </div>
-                        </div>
-                        ${item.note ? `<p class="font-medium text-sm leading-relaxed">"${item.note}"</p>` : ''}
-                        <div class="text-[9px] text-stone-400 font-bold uppercase tracking-widest opacity-70">${item.date} @ ${item.time}</div>
+            listEl.innerHTML = history.length === 0 ? '' : [...history].reverse().map((item, index) => `
+                <div class="card p-4 rounded-2xl border shadow-sm flex justify-between items-center transition-colors">
+                    <div class="pr-4">
+                        <p class="font-bold text-sm leading-tight">${item.note || 'Banh Mi'}</p>
+                        <p class="text-[10px] text-stone-500 uppercase font-bold mt-1">${item.date} @ ${item.time}</p>
                     </div>
-                `).join('');
+                    <div class="text-orange-500 font-black text-2xl flex-shrink-0">${item.rating}<span class="text-xs">★</span></div>
+                </div>
+            `).join('');
             lucide.createIcons();
         }
 
         function addBanhMi() {
-            const noteInput = document.getElementById('noteInput');
-            if (currentRating === 0) return alert("Select stars first!");
+            const rIn = document.getElementById('ratingInput');
+            const nIn = document.getElementById('noteInput');
+            const val = parseInt(rIn.value);
+
+            if (isNaN(val) || val < 1 || val > 5) return alert("Enter 1-5!");
+
             const now = new Date();
             history.push({
-                rating: currentRating,
-                note: noteInput.value.trim(),
+                rating: val,
+                note: nIn.value.trim(),
                 date: now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
                 time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })
             });
+            
             localStorage.setItem('banhMiHistory', JSON.stringify(history));
-            noteInput.value = '';
-            setRating(0);
+            rIn.value = '';
+            nIn.value = '';
             updateUI();
-            if (window.navigator.vibrate) window.navigator.vibrate(60);
         }
 
         function clearAll() {
@@ -167,7 +138,6 @@
             }
         }
 
-        // Initial setup
         applyTheme();
         updateUI();
     </script>
