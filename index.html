@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        body { -webkit-tap-highlight-color: transparent; transition: background-color 0.3s ease, color 0.3s ease; }
+        body { -webkit-tap-highlight-color: transparent; transition: background-color 0.3s ease; touch-action: manipulation; }
         .banh-mi-gradient { background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%); }
         .star-active { fill: #f59e0b !important; color: #f59e0b !important; }
         
@@ -21,8 +21,8 @@
         .mode-dark .star-inactive { fill: transparent; color: #44403c; }
         .mode-dark .input-box { background-color: #0c0a09; border-color: #292524; color: #f5f5f4; }
         
-        /* Ensure stars are clickable even after Lucide replaces them */
-        .star-btn { cursor: pointer; -webkit-appearance: none; background: none; border: none; padding: 4px; }
+        /* High-response touch targets */
+        .touch-target { cursor: pointer; border: none; background: none; padding: 12px; margin: -8px; display: inline-flex; align-items: center; justify-content: center; z-index: 50; position: relative; }
     </style>
 </head>
 <body class="mode-dark min-h-screen pb-10">
@@ -31,7 +31,7 @@
         <h1 class="text-3xl font-black tracking-tighter flex justify-center items-center gap-2">
             <i data-lucide="utensils"></i> BÀNH MÌ LOG
         </h1>
-        <button onclick="toggleTheme()" class="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-white/20 rounded-full active:scale-90 transition-transform">
+        <button onpointerdown="toggleTheme()" class="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-white/20 rounded-full active:scale-90 transition-transform z-50">
             <i id="themeIcon" data-lucide="sun" class="w-6 h-6"></i>
         </button>
     </header>
@@ -46,19 +46,19 @@
         <div class="card p-5 rounded-3xl shadow-xl border space-y-5 transition-all">
             <div class="flex flex-col items-center gap-2">
                 <span class="text-[10px] font-bold text-stone-500 uppercase tracking-widest">Rate this roll</span>
-                <div class="flex justify-center gap-1" id="starPicker">
-                    <button type="button" onclick="setRating(1)" class="star-btn"><i data-lucide="star" class="star-inactive w-8 h-8 pointer-events-none"></i></button>
-                    <button type="button" onclick="setRating(2)" class="star-btn"><i data-lucide="star" class="star-inactive w-8 h-8 pointer-events-none"></i></button>
-                    <button type="button" onclick="setRating(3)" class="star-btn"><i data-lucide="star" class="star-inactive w-8 h-8 pointer-events-none"></i></button>
-                    <button type="button" onclick="setRating(4)" class="star-btn"><i data-lucide="star" class="star-inactive w-8 h-8 pointer-events-none"></i></button>
-                    <button type="button" onclick="setRating(5)" class="star-btn"><i data-lucide="star" class="star-inactive w-8 h-8 pointer-events-none"></i></button>
+                <div class="flex justify-center" id="starPicker">
+                    <button type="button" onpointerdown="setRating(1)" class="touch-target"><i data-lucide="star" class="star-inactive w-8 h-8 pointer-events-none"></i></button>
+                    <button type="button" onpointerdown="setRating(2)" class="touch-target"><i data-lucide="star" class="star-inactive w-8 h-8 pointer-events-none"></i></button>
+                    <button type="button" onpointerdown="setRating(3)" class="touch-target"><i data-lucide="star" class="star-inactive w-8 h-8 pointer-events-none"></i></button>
+                    <button type="button" onpointerdown="setRating(4)" class="touch-target"><i data-lucide="star" class="star-inactive w-8 h-8 pointer-events-none"></i></button>
+                    <button type="button" onpointerdown="setRating(5)" class="touch-target"><i data-lucide="star" class="star-inactive w-8 h-8 pointer-events-none"></i></button>
                 </div>
             </div>
 
             <input type="text" id="noteInput" placeholder="Location or thoughts..." 
-                class="input-box w-full p-4 rounded-xl border-2 outline-none transition-all placeholder-stone-500 shadow-inner">
+                class="input-box w-full p-4 rounded-xl border-2 outline-none transition-all placeholder-stone-500 shadow-inner z-10">
             
-            <button onclick="addBanhMi()" class="w-full banh-mi-gradient active:scale-[0.97] transition-all text-white rounded-2xl py-4 shadow-lg flex items-center justify-center gap-3 text-lg font-bold">
+            <button onpointerdown="addBanhMi()" class="w-full banh-mi-gradient active:scale-[0.97] transition-all text-white rounded-2xl py-4 shadow-lg flex items-center justify-center gap-3 text-lg font-bold z-20">
                 <i data-lucide="plus-circle"></i> LOG SANDWICH
             </button>
         </div>
@@ -68,14 +68,13 @@
                 <h2 class="text-lg font-bold flex items-center gap-2 text-stone-500">
                     <i data-lucide="history"></i> History
                 </h2>
-                <button onclick="clearAll()" class="text-[10px] text-stone-400 font-bold tracking-tighter uppercase">Reset All</button>
+                <button onpointerdown="clearAll()" class="text-[10px] text-stone-400 font-bold tracking-tighter uppercase p-2">Reset All</button>
             </div>
             <div id="historyList" class="space-y-3"></div>
         </div>
     </main>
 
     <script>
-        // Migration Data
         const initialData = [
             { note: "Tiệm nhà Tấm Cám Bánh Mì", rating: 3, date: "Apr 11", time: "16:00" },
             { note: "Bánh Mì ơi - Hà Nội (Vegan, crunchy, tasty!)", rating: 5, date: "Apr 12", time: "11:00" },
@@ -101,14 +100,14 @@
         function applyTheme() {
             document.body.className = isDarkMode ? 'mode-dark min-h-screen pb-10' : 'mode-light min-h-screen pb-10';
             const icon = document.getElementById('themeIcon');
-            icon.setAttribute('data-lucide', isDarkMode ? 'sun' : 'moon');
+            if(icon) icon.setAttribute('data-lucide', isDarkMode ? 'sun' : 'moon');
             lucide.createIcons();
         }
 
         function setRating(n) {
             currentRating = n;
-            const starButtons = document.querySelectorAll('#starPicker .star-btn i');
-            starButtons.forEach((star, i) => {
+            const starIcons = document.querySelectorAll('#starPicker i');
+            starIcons.forEach((star, i) => {
                 if (i < n) {
                     star.classList.add('star-active');
                     star.classList.remove('star-inactive');
@@ -145,7 +144,7 @@
 
         function addBanhMi() {
             const noteInput = document.getElementById('noteInput');
-            if (currentRating === 0) return alert("Give it a rating first!");
+            if (currentRating === 0) return alert("Select stars first!");
             const now = new Date();
             history.push({
                 rating: currentRating,
@@ -155,7 +154,7 @@
             });
             localStorage.setItem('banhMiHistory', JSON.stringify(history));
             noteInput.value = '';
-            setRating(0); // This resets stars visually
+            setRating(0);
             updateUI();
             if (window.navigator.vibrate) window.navigator.vibrate(60);
         }
@@ -168,6 +167,7 @@
             }
         }
 
+        // Initial setup
         applyTheme();
         updateUI();
     </script>
