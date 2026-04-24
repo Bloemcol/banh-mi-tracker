@@ -21,16 +21,18 @@
 </head>
 <body class="mode-dark min-h-screen pb-10">
 
-    <header class="banh-mi-gradient p-6 text-white text-center shadow-xl relative">
+    <header class="banh-mi-gradient p-8 text-white text-center shadow-xl relative">
         <h1 class="text-3xl font-black tracking-tighter">BÀNH MÌ LOG</h1>
-        <button onclick="toggleTheme()" class="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-white/20 rounded-full">
-            <i id="themeIcon" data-lucide="sun" class="w-6 h-6"></i>
+        <p id="slogan" class="text-[10px] font-bold opacity-90 tracking-widest mt-1 uppercase"></p>
+        
+        <button onclick="toggleTheme()" class="absolute right-4 top-4 p-2 bg-white/20 rounded-full">
+            <i id="themeIcon" data-lucide="sun" class="w-5 h-5"></i>
         </button>
     </header>
 
     <main class="max-w-md mx-auto p-6 space-y-6">
         
-        <div class="card rounded-3xl p-6 shadow-lg border text-center relative transition-all">
+        <div class="card rounded-3xl p-6 shadow-lg border text-center transition-all">
             <span class="text-stone-500 uppercase tracking-widest text-[10px] font-bold">Total Devoured</span>
             <div id="count" class="text-6xl font-black text-orange-500 my-1">0</div>
             
@@ -52,7 +54,6 @@
                         class="input-field w-full p-4 rounded-xl border-2 outline-none transition-all">
                 </div>
             </div>
-            
             <button onclick="addBanhMi()" class="w-full banh-mi-gradient text-white rounded-2xl py-4 shadow-lg text-lg font-bold active:scale-[0.98] transition-transform">
                 LOG SANDWICH
             </button>
@@ -73,12 +74,20 @@
             { note: "Bánh Mì ơi - Hà Nội (the best! Vegan and super crunchy and tasty)", rating: 5, date: "Apr 12", time: "11:00" },
             { note: "Tự Châu Veggie - Vegan Mixed Pho, Banhmi & Kombucha", rating: 3, date: "Apr 12", time: "16:00" },
             { note: "Hàng Bánh Mì (Hang Banh Mi) (no crunch)", rating: 1, date: "Apr 12", time: "21:45" },
-            { note: "Egg mayo was okay! The other stuff was way better (coconut coffee and the smashed croissants as waffles) @ THE MIST SAPA", rating: 3, date: "Apr 15", time: "11:00" }
+            { note: "Egg mayo was okay! The other stuff was way better (coconut coffee and the smashed croissants as waffles) @ THE MIST SAPA", rating: 3, date: "Apr 15", time: "11:00" },
+            { note: "Bánh Mì ơi - Hà Nội again (1/2): chicken", rating: 4, date: "Apr 16", time: "22:28" },
+            { note: "Bánh Mì ơi - Hà Nội again! The traditional one was amazing! The chicken was also pretty nice but couldn't beat the OG. Super tasty, great crunch and dirt cheap", rating: 5, date: "Apr 16", time: "22:29" },
+            { note: "Bánh Mì Ba Bự: special and salt coffee, really nice!", rating: 4, date: "Apr 20", time: "10:47" },
+            { note: "Bánh Mì Ba Bự: Tofu banh mi is just not it :/", rating: 3, date: "Apr 20", time: "11:29" },
+            { note: "Meliá Vinpearl Hue, 7th-floor Rumba restaurant: very average. Wouldn't take another one. But it was okay for a waiting snack while the bread was toasting!", rating: 2, date: "Apr 21", time: "07:41" },
+            { note: "Ba Hưng Bakery: egg banh mi. Totally passable! Wouldn't go out of my way to get it but if the tour bus takes you, you might as well", rating: 3, date: "Apr 21", time: "13:27" },
+            { note: "Phi banh mi: traditional and egg. Must be called traditional for a reason!", rating: 5, date: "Apr 23", time: "11:56" },
+            { note: "Peanuts (vegan chick'n on a sourdough baguette): this was kinda cheating lol. Even though the chick'n was great and the baguette tasty and crunchy, it didn't hit like I would've expected it to! Also: forgot to remove the coriander", rating: 3, date: "Apr 24", time: "15:33" }
         ];
 
         let history = JSON.parse(localStorage.getItem('banhMiHistory')) || [];
 
-        if (history.length === 0) {
+        if (history.length < 13) {
             history = initialData;
             localStorage.setItem('banhMiHistory', JSON.stringify(history));
         }
@@ -94,15 +103,20 @@
         function applyTheme() {
             document.body.className = isDarkMode ? 'mode-dark min-h-screen pb-10' : 'mode-light min-h-screen pb-10';
             const icon = document.getElementById('themeIcon');
-            icon.setAttribute('data-lucide', isDarkMode ? 'sun' : 'moon');
+            if (icon) icon.setAttribute('data-lucide', isDarkMode ? 'sun' : 'moon');
             lucide.createIcons();
         }
 
         function updateUI() {
-            document.getElementById('count').innerText = history.length;
-            const listEl = document.getElementById('historyList');
+            const count = history.length;
+            document.getElementById('count').innerText = count;
             
-            listEl.innerHTML = history.length === 0 ? '' : [...history].reverse().map((item, index) => {
+            // Calculate and display slogan
+            const rate = (count / 20).toFixed(2);
+            document.getElementById('slogan').innerText = `(${rate} banh mi a day keeps the doctor away!)`;
+
+            const listEl = document.getElementById('historyList');
+            listEl.innerHTML = [...history].reverse().map((item, index) => {
                 const starRow = Array.from({length: 5}, (_, i) => {
                     const isFilled = i < item.rating;
                     return `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="${isFilled ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" class="${isFilled ? 'star-filled' : 'star-empty'}"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
@@ -114,7 +128,7 @@
                             <span class="font-black text-stone-500 text-[10px] italic">#${history.length - index}</span>
                             <div class="flex gap-0.5">${starRow}</div>
                         </div>
-                        <p class="font-bold text-sm leading-snug">${item.note || 'Banh Mi'}</p>
+                        <p class="font-bold text-sm leading-snug whitespace-pre-wrap">${item.note || 'Banh Mi'}</p>
                         <p class="text-[10px] text-stone-500 uppercase font-bold tracking-tighter">${item.date} @ ${item.time}</p>
                     </div>
                 `;
@@ -141,33 +155,24 @@
             updateUI();
         }
 
-        // --- NEW EXPORT FUNCTION ---
         function exportData() {
             if (history.length === 0) return alert("Nothing to share yet!");
-            
             let text = `🥖 MY BÀNH MÌ LOG 🥖\nTotal devoured: ${history.length}\n\n`;
-            
             [...history].reverse().forEach((item, i) => {
                 const stars = "⭐".repeat(item.rating);
                 text += `#${history.length - i} [${stars}]\n"${item.note}"\n📅 ${item.date} @ ${item.time}\n\n`;
             });
-            
             text += "Tracked with Banh Mi Log";
-
             if (navigator.share) {
-                navigator.share({
-                    title: 'My Banh Mi Progress',
-                    text: text
-                }).catch(console.error);
+                navigator.share({ title: 'My Banh Mi Progress', text: text }).catch(console.error);
             } else {
-                // Fallback for browsers that don't support Share API
-                alert("Copied to clipboard!");
                 navigator.clipboard.writeText(text);
+                alert("Copied to clipboard!");
             }
         }
 
         function clearAll() {
-            if (confirm("Reset?")) {
+            if (confirm("Reset everything?")) {
                 history = [];
                 localStorage.removeItem('banhMiHistory');
                 updateUI();
