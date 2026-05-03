@@ -3,73 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Banh Mi Tracker</title>
+    <title>Banh Mi Tracker - Final</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         body { -webkit-tap-highlight-color: transparent; transition: background-color 0.3s ease; }
         .banh-mi-gradient { background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%); }
-        .mode-light { background-color: #fafaf9; color: #1c1917; }
-        .mode-light .card { background-color: #ffffff; border-color: #e7e5e4; }
-        .mode-light .input-field { background-color: #f5f5f4; border-color: #e7e5e4; color: #1c1917; }
         .mode-dark { background-color: #0c0a09; color: #f5f5f4; }
         .mode-dark .card { background-color: #1c1917; border-color: #292524; }
-        .mode-dark .input-field { background-color: #0c0a09; border-color: #292524; color: #f5f5f4; }
+        .mode-dark .input-field { background-color: #0c0a09; border-color: #292524; color: #f5f5f4; opacity: 0.5; }
         .star-filled { fill: #f59e0b; color: #f59e0b; }
         .star-empty { color: #44403c; opacity: 0.5; }
+        .btn-disabled { background: #292524 !important; color: #57534e !important; cursor: not-allowed; }
     </style>
 </head>
 <body class="mode-dark min-h-screen pb-10">
 
     <header class="banh-mi-gradient p-8 text-white text-center shadow-xl relative">
         <h1 class="text-3xl font-black tracking-tighter">BÀNH MÌ LOG</h1>
-        <p id="slogan" class="text-[10px] font-bold opacity-90 tracking-widest mt-1 uppercase"></p>
-        
-        <button onclick="toggleTheme()" class="absolute right-4 top-4 p-2 bg-white/20 rounded-full">
-            <i id="themeIcon" data-lucide="sun" class="w-5 h-5"></i>
-        </button>
+        <p id="slogan" class="text-[10px] font-bold opacity-90 tracking-widest mt-1 uppercase">(0.75 banh mi a day keeps the doctor away!)</p>
     </header>
 
     <main class="max-w-md mx-auto p-6 space-y-6">
-        
         <div class="card rounded-3xl p-6 shadow-lg border text-center transition-all">
-            <span class="text-stone-500 uppercase tracking-widest text-[10px] font-bold">Total Devoured</span>
-            <div id="count" class="text-6xl font-black text-orange-500 my-1">0</div>
-            
+            <span class="text-stone-500 uppercase tracking-widest text-[10px] font-bold">Final Count</span>
+            <div id="count" class="text-6xl font-black text-orange-500 my-1">15</div>
             <button onclick="exportData()" class="mt-2 text-orange-500 flex items-center gap-1 mx-auto font-bold text-xs uppercase tracking-tighter border border-orange-500/30 px-3 py-1 rounded-full active:scale-95 transition-all">
-                <i data-lucide="share" class="w-3 h-3"></i> Share My Progress
+                <i data-lucide="share" class="w-3 h-3"></i> Export Final Log
             </button>
         </div>
 
-        <div class="card p-5 rounded-3xl shadow-lg border space-y-4 transition-all">
+        <div class="card p-5 rounded-3xl shadow-lg border space-y-4 opacity-80">
             <div class="grid grid-cols-4 gap-3">
                 <div class="col-span-1">
-                    <label class="text-[10px] font-bold text-stone-500 uppercase block mb-1 text-center">Stars</label>
-                    <input type="number" id="ratingInput" min="1" max="5" inputmode="numeric" placeholder="1-5" 
-                        class="input-field w-full p-4 rounded-xl border-2 outline-none text-center font-bold text-lg">
+                    <input disabled type="text" placeholder="-" class="input-field w-full p-4 rounded-xl border-2 text-center font-bold">
                 </div>
                 <div class="col-span-3">
-                    <label class="text-[10px] font-bold text-stone-500 uppercase block mb-1">Details</label>
-                    <input type="text" id="noteInput" placeholder="Location or thoughts..." 
-                        class="input-field w-full p-4 rounded-xl border-2 outline-none transition-all">
+                    <input disabled type="text" placeholder="Logging closed..." class="input-field w-full p-4 rounded-xl border-2">
                 </div>
             </div>
-            <button onclick="addBanhMi()" class="w-full banh-mi-gradient text-white rounded-2xl py-4 shadow-lg text-lg font-bold active:scale-[0.98] transition-transform">
-                LOG SANDWICH
+            <button disabled class="w-full btn-disabled rounded-2xl py-4 shadow-lg text-lg font-bold uppercase tracking-widest">
+                Trip Complete ✈️
             </button>
+            <p class="text-[10px] text-center text-stone-500 font-bold uppercase">All 15 sandwiches have been archived.</p>
         </div>
 
         <div class="space-y-4">
-            <div class="flex justify-between items-end px-2">
-                <h2 class="text-lg font-bold text-stone-500 italic">History</h2>
-                <button onclick="clearAll()" class="text-[10px] text-stone-400 font-bold uppercase">Reset</button>
-            </div>
+            <h2 class="text-lg font-bold text-stone-500 italic px-2">The Full History</h2>
             <div id="historyList" class="space-y-3"></div>
         </div>
     </main>
 
     <script>
-        const initialData = [
+        const finalHistory = [
             { note: "Tiệm nhà Tấm Cám Bánh Mì Tiệm Nhà Tấm Cám", rating: 3, date: "Apr 11", time: "16:00" },
             { note: "Bánh Mì ơi - Hà Nội (the best! Vegan and super crunchy and tasty)", rating: 5, date: "Apr 12", time: "11:00" },
             { note: "Tự Châu Veggie - Vegan Mixed Pho, Banhmi & Kombucha", rating: 3, date: "Apr 12", time: "16:00" },
@@ -82,104 +68,40 @@
             { note: "Meliá Vinpearl Hue, 7th-floor Rumba restaurant: very average. Wouldn't take another one. But it was okay for a waiting snack while the bread was toasting!", rating: 2, date: "Apr 21", time: "07:41" },
             { note: "Ba Hưng Bakery: egg banh mi. Totally passable! Wouldn't go out of my way to get it but if the tour bus takes you, you might as well", rating: 3, date: "Apr 21", time: "13:27" },
             { note: "Phi banh mi: traditional and egg. Must be called traditional for a reason!", rating: 5, date: "Apr 23", time: "11:56" },
-            { note: "Peanuts (vegan chick'n on a sourdough baguette): this was kinda cheating lol. Even though the chick'n was great and the baguette tasty and crunchy, it didn't hit like I would've expected it to! Also: forgot to remove the coriander", rating: 3, date: "Apr 24", time: "15:33" }
+            { note: "Peanuts (vegan chick'n on a sourdough baguette): this was kinda cheating lol. Even though the chick'n was great and the baguette tasty and crunchy, it didn't hit like I would've expected it to! Also: forgot to remove the coriander", rating: 3, date: "Apr 24", time: "15:33" },
+            { note: "74 - Bánh Mì, Cafe & Tea: egg and pate. I liked it, but it had more of a baguette feeling than a banh mi tbh. This one would be a 3.5 if that were possible. Would try again!", rating: 3, date: "Apr 25", time: "13:55" },
+            { note: "Bánh Mì The One – Vietnamese Sandwich & Vegan Food: egg and pate. Nice crunch. Just not enough for 5 stars!", rating: 4, date: "Apr 26", time: "12:33" }
         ];
 
-        let history = JSON.parse(localStorage.getItem('banhMiHistory')) || [];
-
-        if (history.length < 13) {
-            history = initialData;
-            localStorage.setItem('banhMiHistory', JSON.stringify(history));
-        }
-
-        let isDarkMode = localStorage.getItem('theme') !== 'light';
-
-        function toggleTheme() {
-            isDarkMode = !isDarkMode;
-            localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
-            applyTheme();
-        }
-
-        function applyTheme() {
-            document.body.className = isDarkMode ? 'mode-dark min-h-screen pb-10' : 'mode-light min-h-screen pb-10';
-            const icon = document.getElementById('themeIcon');
-            if (icon) icon.setAttribute('data-lucide', isDarkMode ? 'sun' : 'moon');
-            lucide.createIcons();
-        }
-
         function updateUI() {
-            const count = history.length;
-            document.getElementById('count').innerText = count;
-            
-            // Calculate and display slogan
-            const rate = (count / 20).toFixed(2);
-            document.getElementById('slogan').innerText = `(${rate} banh mi a day keeps the doctor away!)`;
-
             const listEl = document.getElementById('historyList');
-            listEl.innerHTML = [...history].reverse().map((item, index) => {
-                const starRow = Array.from({length: 5}, (_, i) => {
-                    const isFilled = i < item.rating;
-                    return `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="${isFilled ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" class="${isFilled ? 'star-filled' : 'star-empty'}"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
-                }).join('');
+            listEl.innerHTML = [...finalHistory].reverse().map((item, index) => {
+                const stars = Array.from({length: 5}, (_, i) => 
+                    `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="${i < item.rating ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" class="${i < item.rating ? 'star-filled' : 'star-empty'}"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`
+                ).join('');
 
                 return `
-                    <div class="card p-4 rounded-2xl border shadow-sm space-y-2 transition-colors">
+                    <div class="card p-4 rounded-2xl border shadow-sm space-y-2">
                         <div class="flex justify-between items-center">
-                            <span class="font-black text-stone-500 text-[10px] italic">#${history.length - index}</span>
-                            <div class="flex gap-0.5">${starRow}</div>
+                            <span class="font-black text-stone-500 text-[10px] italic">#${finalHistory.length - index}</span>
+                            <div class="flex gap-0.5">${stars}</div>
                         </div>
-                        <p class="font-bold text-sm leading-snug whitespace-pre-wrap">${item.note || 'Banh Mi'}</p>
+                        <p class="font-bold text-sm leading-snug whitespace-pre-wrap">${item.note}</p>
                         <p class="text-[10px] text-stone-500 uppercase font-bold tracking-tighter">${item.date} @ ${item.time}</p>
-                    </div>
-                `;
+                    </div>`;
             }).join('');
             lucide.createIcons();
         }
 
-        function addBanhMi() {
-            const rIn = document.getElementById('ratingInput');
-            const nIn = document.getElementById('noteInput');
-            const val = parseInt(rIn.value);
-            if (isNaN(val) || val < 1 || val > 5) return alert("Enter 1-5!");
-
-            const now = new Date();
-            history.push({
-                rating: val,
-                note: nIn.value.trim(),
-                date: now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-                time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })
-            });
-            
-            localStorage.setItem('banhMiHistory', JSON.stringify(history));
-            rIn.value = ''; nIn.value = '';
-            updateUI();
-        }
-
         function exportData() {
-            if (history.length === 0) return alert("Nothing to share yet!");
-            let text = `🥖 MY BÀNH MÌ LOG 🥖\nTotal devoured: ${history.length}\n\n`;
-            [...history].reverse().forEach((item, i) => {
-                const stars = "⭐".repeat(item.rating);
-                text += `#${history.length - i} [${stars}]\n"${item.note}"\n📅 ${item.date} @ ${item.time}\n\n`;
+            let text = `🥖 FINAL BÀNH MÌ LOG 🥖\nTotal: 15 sandwiches in 20 days\n\n`;
+            [...finalHistory].reverse().forEach((item, i) => {
+                text += `#${finalHistory.length - i} ["${"⭐".repeat(item.rating)}"]\n"${item.note}"\n📅 ${item.date} @ ${item.time}\n\n`;
             });
-            text += "Tracked with Banh Mi Log";
-            if (navigator.share) {
-                navigator.share({ title: 'My Banh Mi Progress', text: text }).catch(console.error);
-            } else {
-                navigator.clipboard.writeText(text);
-                alert("Copied to clipboard!");
-            }
+            if (navigator.share) navigator.share({ title: 'My Final Banh Mi Log', text: text });
+            else { navigator.clipboard.writeText(text); alert("Final log copied!"); }
         }
 
-        function clearAll() {
-            if (confirm("Reset everything?")) {
-                history = [];
-                localStorage.removeItem('banhMiHistory');
-                updateUI();
-            }
-        }
-
-        applyTheme();
         updateUI();
     </script>
 </body>
